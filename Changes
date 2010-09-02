@@ -1,0 +1,6 @@
+Revision history for Perl extension Persevere::Client.
+
+0.01  Sun Apr 19 18:25:06 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Persevere::Client
+
