@@ -1,4 +1,4 @@
-package Persevere::Client;
+﻿package Persevere::Client;
 
 use warnings;
 use strict;
@@ -247,8 +247,6 @@ sub class{
 
 This module Is a simple interface to Persevere, the JSON Database.
 
-This module provides an interface similar to that of Couchdb::Client
-
 View documentation on Persevere::Client::Class for information on how
 to interact with Persevere Classes.
 
@@ -277,7 +275,7 @@ use Persevere::Client;
       @class_list = @{$classreq->{data}};
   }
 
-=head1 MEATHODS 
+=head1 METHODS 
 
 =over 8
 
@@ -291,7 +289,7 @@ json - which defaults to a JSON::Any object with utf8 and allow_blessed turned o
 
 ua - which is a LWP::UserAgent object and can also be replaced.
 
-agent - Replace the name the defaut LWP::UserAgent reports to the db when it crud's 
+agent - Replace the name the default LWP::UserAgent reports to the db when it crud's 
 
 debug - boolean, defaults to false, set to 1 to enable debug messages (show's crud sent to persevere). 
 
@@ -337,7 +335,7 @@ All requests made to the server that do not have a boolean response return a req
 
 =item serverInfo
 
-Returns a req hash, server metadata is contained in {data}, and is typically something that looks like { id => "status", version => "1.0 beta 2" ... }. It throws an warning if it can't connect.
+Returns a req hash, server meta data is contained in {data}, and is typically something that looks like { id => "status", version => "1.0 beta 2" ... }. It throws an warning if it can't connect.
 
 =item classExists
 
@@ -349,7 +347,7 @@ Returns an req hash, with {data} containing all non core class names that the se
 
 =item class
 
-Returns a new Persevere::Client::Class object for a class of that name. Note that the Class does not need to exist yet, and will not be created if it doesn't. The create meathod will create the class, and is documented in Persevere::Client::Class
+Returns a new Persevere::Client::Class object for a class of that name. Note that the Class does not need to exist yet, and will not be created if it doesn't. The create method will create the class, and is documented in Persevere::Client::Class
 
 =back
 
