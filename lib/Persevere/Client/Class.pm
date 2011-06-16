@@ -9,7 +9,7 @@ Persevere::Client::Class - The Class interface to Persevere the JSON Database
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use HTTP::Request::Common qw(GET HEAD POST PUT DELETE);
 use Carp        qw(confess);
@@ -376,7 +376,7 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE 
 
-Copyright 2009 Nathanael Anderson.
+Copyright 2009-2011 Nathanael Anderson.
 
 s program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
