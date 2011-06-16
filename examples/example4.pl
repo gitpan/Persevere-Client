@@ -6,20 +6,23 @@ use Persevere::Client;
 use JSON::XS;
 use Data::Dumper;
 
+# Enforced schema example
+
 my $json = JSON::XS->new->ascii->shrink->allow_nonref;
 
 my $persvr = Persevere::Client->new(
-  host => "localhost",
-  port => "7070",
-  auth_type => "none",
-#  auth_type => "basic",
-#  username => "test",
-#  password => "pass",
-  defaultSourceClass => "org.persvr.datasource.InMemorySource",
+	host => "localhost",
+	port => "7080",
+	auth_type => "none",
+#	auth_type => "basic",
+#	username => "test",
+#	password => "pass",
+	defaultSourceClass => "org.persvr.datasource.InMemorySource",
 	debug => "1"
 );
 
 my $dataname = "TestStore";
+# uuid uses strings instead of integer's for the id field
 my $test = $persvr->class($dataname)->uuid;
 $test->properties(
 	'value' => {'index' => $json->true, 'optional' => $json->false, 'type' => 'string'},
@@ -27,13 +30,13 @@ $test->properties(
 );
 #my $test = $persvr->class($dataname)->uuid;
 if (!($test->exists)){
-	#print "Creating Class: " . $test->fullname . "\n";
+	print "Creating Class: " . $test->fullname . "\n";
 	my $result = $test->create;
 	if ($result->{success}){
-		#print "successfully created " . $test->fullname . " class\n";
+		print "successfully created " . $test->fullname . " class\n";
 	}
 }else{
-	#print "Class " . $test->fullname . " already exists\n";
+	print "Class " . $test->fullname . " already exists\n";
 }
 
 # This example uses uuid's to store values, so they must be strings, and an id must be set
@@ -46,10 +49,10 @@ my @values = (\%h1, \%h2, \%h3, \%h4);
 
 my $result = $test->updateObjects(\@values);
 if ($result->{success}){
-	#print "Updated: " . $test->fullname . "\n";
+	print "Updated: " . $test->fullname . "\n";
 	print $test->{content} . "\n";
 }else{
-	#print "Failed to update " . $test->fullname . "\n";
+	print "Failed to update " . $test->fullname . "\n";
 }
 
 my $query = $test->query("?value=\"test1\"");
@@ -57,7 +60,7 @@ if ($query->{success}){
 	my @data = @{$query->{data}};
 	print $json->pretty->encode(\@data) . "\n";
 }else{
-	#print "Error preforming querry\n";
+	print "Error preforming querry\n";
 }
 
 # this should fail
@@ -65,9 +68,9 @@ my %baddata = (id => "item5", position => "5");
 my @post = (\%baddata);
 my $badr = $test->updateObjects(\@post);
 if ($result->{success}){
-	#print "Updated: " . $test->fullname . "\n";
+	print "Updated: " . $test->fullname . "\n";
 	print $test->{content} . "\n";
 }else{
-	#print "Failed to update " . $test->fullname . "\n";
+	print "Failed to update " . $test->fullname . "\n";
 	print $test->{content} . "\n";
 }

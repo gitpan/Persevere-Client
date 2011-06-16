@@ -8,10 +8,11 @@ my $json = JSON::XS->new->ascii->shrink->allow_nonref;
 my $persvr = Persevere::Client->new(
 	host => "localhost", 
 	port => "8080", 
+	auth_type => "none",
 #	auth_type => "basic", 
 #	username => "test", 
 #	password => "pass",
-	debug => 0
+	debug => 1 
 );
 
 die "Unable to connect to $persvr->{uri}\n" if !($persvr->testConnection);
@@ -94,7 +95,7 @@ if ($persvr->classExists($testClassName)){
 }
 
 my $class = $persvr->class("Transport");
-die "Transport class doesn't exist" if (!($class->exists));
+die "Transport class doesn't exist, don't worry though, these tests aren't packaged with the module yet" if (!($class->exists));
 die "a class doesn't exist" if (!($persvr->classExists("Transport")));
 my $query = '[?artist="Elucidate"]';
 print "Running Query $query in " . $class->fullname . "\n";

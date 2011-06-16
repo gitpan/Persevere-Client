@@ -4,21 +4,15 @@ use strict;
 use Persevere::Client;
 use JSON::XS;
 
-# Create, Update, Delete Example
-
 my $json = JSON::XS->new;
 
 my $persvr = Persevere::Client->new(
-	host => "localhost",
-	port => "8080",
-	auth_type => "none",
-#	auth_type => "basic",
-#	username => "test",
-#	password => "pass",
-	debug => 1,
-	defaultSourceClass => "org.persvr.datasource.InMemorySource"
+           host => "localhost",
+           port => "7080",
+           auth_type => "basic",
+           username => "test",
+           password => "pass" 
 );
-
 
 sub createTestObjects($){
     my $total = shift;
@@ -31,23 +25,23 @@ sub createTestObjects($){
             $type = "odd";
         }
         chomp $type;
-        my %hash = ("name$loop" => "test$loop", "type" => $type, "value" => "$loop");
+        my %hash = ("name$loop" => "test$loop", "type" => $type, "value" => $loop);
         push @data, \%hash;
     }
     return @data;
 }
 
-my %hash1 = ("name" => "test01", "type" => "odd", "value" => "19");
-my %hash2 = ("name" => "test02", "type" => "even", "value" => "20");
+my %hash1 = ("name" => "test01", "type" => "odd", "value" => 19);
+my %hash2 = ("name" => "test02", "type" => "even", "value" => 20);
 
 
 sub show_classes(){
 	my @class_list;
 	my $classreq = $persvr->listClassNames;
-	if ($classreq->{success}){
+		if ($classreq->{success}){
 	    @class_list = @{$classreq->{data}};
 	}
-	print "\nClasses:\n";
+	print "Classes:\n";
 	print $json->encode(\@class_list) . "\n";
 }
 
@@ -57,12 +51,13 @@ push @post_data, \%hash1;
 push @post_data, \%hash2;
 push @post_data, createTestObjects(4);
 my $className = "NewClass";
-my $initialclass = $persvr->class($className)->uuid;
+my $initialclass = $persvr->class($className);
 print "Class: " . $initialclass->fullname . "\n";
 
 show_classes();
 # users can check if a class exists either by using a class object, or by asking the server
 
+print "class: " . $initialclass->exists . " " . $persvr->classExists("$className") . "\n";
 if (!($initialclass->exists)){
 	my $outcome = $initialclass->create;
 	if ($outcome->{success}){
@@ -84,7 +79,7 @@ if (!($postreq->{success})){
 
 if ($initialclass->exists){
 	my @results;
-	my $datareq = $initialclass->query("[?type='even']");
+	my $datareq = $initialclass->queryAll("[?type='even']");
 	if ($datareq->{success}){
 		my @data = @{$datareq->{data}};
 		my @new_data;
@@ -103,10 +98,7 @@ if ($initialclass->exists){
 	if ($datareq->{auth}){
 		print "this user has rights to correctly preform the action they just executed\n";
 	}
-	# Use this to debug problems
-	# print $json->pretty->encode(\%{$datareq}) ."\n";
 }
-
 
 if ($initialclass->delete){
 	print "Successfully deleted " .$initialclass->fullname . "\n";

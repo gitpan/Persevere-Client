@@ -1,16 +1,11 @@
-Persevere-Client version 0.01
+Persevere-Client version 0.2
 =============================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+This is a module for interacting with the Persevere JSON Database, which Supports REST Database interactions, and comet updates.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+version 0.2 addes the propSet method, and deleteById method, to allow for updating objects 
+
+The examples directory has complete functional examples that show full usage of this module
 
 INSTALLATION
 
@@ -25,13 +20,17 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  blah blah blah
+JSON::Any
+LWP::UserAgent
+HTTP:Rquest
+HTTP::Status
+HTTP::Headers
+HTTP::Response
+HTTP::Cookies
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
-
-Copyright (C) 2009 by A. U. Thor
+Copyright (C) 2011 by Nathanael Anderson
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

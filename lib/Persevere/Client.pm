@@ -1,4 +1,4 @@
-﻿package Persevere::Client;
+package Persevere::Client;
 
 use warnings;
 use strict;
@@ -19,11 +19,11 @@ Persevere::Client - A Simple to use Interface to Persevere the JSON Database
 
 =head1 VERSION
 
-Version 0.01
+Version 0.2
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.2';
 
 sub new{
 	my $class = shift;
@@ -38,12 +38,6 @@ sub new{
 		($opt{host}   || 'localhost') . ':'   .
 		($opt{port}   || '8080')      . '/';
 	}
-	if ($opt{base_uri}){
-		$self{base_uri} = "$opt{base_uri}/";
-	}else{
-		$self{base_uri} = "";
-	}
-	$self{uri} .= "$self{base_uri}";
 	$self{json} = ($opt{json} || JSON::Any->new(utf8 => 1, allow_blessed =>1));
 	$self{ua}   = ($opt{ua}   || LWP::UserAgent->new(agent => ($self{agent} || "Persevere::Client/$VERSION")));
 	if (defined $opt{query_timeout}){
@@ -101,9 +95,6 @@ sub new{
 sub testConnection{
 	my $self = shift;
 	my $testpath =  $self->{uri} . "status";
-	if ($self->{debug}){
-		print "DEBUG (FUNCTION testConnection): GET $testpath\n";
-	}
 	my $testresponse = $self->req('GET', $testpath, undef, undef, 1);
 	if (!($testresponse->{success})){
 		return 0;
@@ -114,9 +105,6 @@ sub testConnection{
 
 sub serverInfo{
 	my $self = shift;
-	if ($self->{debug}){
-		print "DEBUG (FUNCTION serverInfo): GET $self->{uri}status\n";
-	}
 	my $inforesponse = $self->req('GET', "$self->{uri}status", undef, undef, 1);
 	if ($self->testConnection){
 		return $inforesponse;
@@ -130,10 +118,10 @@ sub classExists{
 		$self->alert("No class passed to classExists, classExists requires a class name to properly function");
 	}
 	if ($self->{debug}){
-		print "DEBUG (FUNCTION classExists): GET $self->{uri}Class/$ClassName\n";
-	}
- 	my $classresponse = $self->req('GET', "$self->{uri}Class/$ClassName", undef, undef, 1);
- 	if ($classresponse->{success}){
+                print "DEBUG (FUNCTION classExists): GET $self->{uri}Class/$ClassName\n";
+        }
+  	my $classresponse = $self->req('GET', "$self->{uri}Class/$ClassName", undef, undef, 1);
+  	if ($classresponse->{success}){
 		return 1;
 	}else{
 		return 0;
@@ -162,10 +150,10 @@ sub classExists{
 sub listClassNames{
 	my $self = shift;
 	my @classlist;
-	if ($self->{debug}){
-		print "DEBUG (FUNCTION listClassNames): GET $self->{uri}Class/\n";
-	}
 	my $classresponse = $self->req('GET', "$self->{uri}Class/");
+	if ($self->{debug}){
+                print "DEBUG (FUNCTION listClassNames): GET $self->{uri}Class/\n";
+        }
 	my @allclasses = $classresponse->{data};
 	my @inside = @{$allclasses[0]};
 	foreach my $item (@inside){
@@ -190,14 +178,32 @@ sub req{
 	my $header = shift;
 	my $cont = shift;
 	my $nowarn = shift;
+	my $noencode = shift;
 	my $content;
-	
-	if ((ref($cont) eq "ARRAY") || (ref($cont) eq "HASH")){
-		$content = encode('utf-8', $self->{json}->encode($cont));
-	}else{
-		$content = $cont;
+	if (!(defined $nowarn)){
+		$nowarn = 0;
 	}
+	if (!(defined $noencode)){
+		$noencode = 0;
+	}
+	if ($noencode){
+		$content = $cont;
+	}elsif (ref $cont){
+		$content = encode('utf-8', $self->{json}->encode($cont));
+	}
+	my $dheader; # debug header
+	if (!(defined $header)){
+		$dheader = "";
+	}
+	if (!(defined $content)){
+		$content = "";
+	}
+#	if ($self->{debug}){
+#		print "DEBUG (FUNCTION req): Method: $meth Path: $path Header: $dheader Content: $content NoWarn: $nowarn NoEncode: $noencode\n";
+#	}
+	
 	my $res = $self->{ua}->request(HTTP::Request->new($meth, $path, $header, $content));
+	my $query = "$meth, $path, $dheader, $content";
 	my $auth_status;
 	if ($res->code == 401){
 		$auth_status = 0;
@@ -209,15 +215,14 @@ sub req{
 		status_line => $res->status_line,
 		success => 0,
 		content => $res->content,
-		auth => $auth_status
+		auth => $auth_status,
+		query => $query
 	};
 	if ($res->is_success){
 		$ret->{success} = 1;
-		eval {
+		if (!($noencode)){
 			$ret->{data} = $self->{json}->decode($res->content);
-		};
-		if ($@){
-			# if our content isn't json, set its outcome to data
+		}else{
 			$ret->{data} = $res->content;
 		}
 		$ret->{range} = $res->header('Content-Range') if (defined $res->header('Content-Range'));
@@ -247,6 +252,8 @@ sub class{
 
 This module Is a simple interface to Persevere, the JSON Database.
 
+This module provides an interface similar to that of Couchdb::Client
+
 View documentation on Persevere::Client::Class for information on how
 to interact with Persevere Classes.
 
@@ -275,7 +282,7 @@ use Persevere::Client;
       @class_list = @{$classreq->{data}};
   }
 
-=head1 METHODS 
+=head1 MEATHODS 
 
 =over 8
 
@@ -289,13 +296,11 @@ json - which defaults to a JSON::Any object with utf8 and allow_blessed turned o
 
 ua - which is a LWP::UserAgent object and can also be replaced.
 
-agent - Replace the name the default LWP::UserAgent reports to the db when it crud's 
+agent - Replace the name the defaut LWP::UserAgent reports to the db when it crud's 
 
 debug - boolean, defaults to false, set to 1 to enable debug messages (show's crud sent to persevere). 
 
 auth_type  - can be set to basic, json-rpc, or none, basic is default, and throws an error without a username and password. json-rpc auth is not yet implemented.
-
-base_uri - when persevere is started with a base_uri, setting this will make all calls be preformed correctly
 
 query_timeout - how long to wait until timing out on a request, defaults to 30. 
 
@@ -335,7 +340,7 @@ All requests made to the server that do not have a boolean response return a req
 
 =item serverInfo
 
-Returns a req hash, server meta data is contained in {data}, and is typically something that looks like { id => "status", version => "1.0 beta 2" ... }. It throws an warning if it can't connect.
+Returns a req hash, server metadata is contained in {data}, and is typically something that looks like { id => "status", version => "1.0 beta 2" ... }. It throws an warning if it can't connect.
 
 =item classExists
 
@@ -396,7 +401,7 @@ L<http://search.cpan.org/dist/Persevere-Client/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2010 Nathanael Anderson.
+Copyright 2009 Nathanael Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -9,7 +9,7 @@ my $json = JSON::XS->new;
 
 my $persvr = Persevere::Client->new(
 	host => "localhost",
-	port => "8090",
+	port => "8080",
 	auth_type => "none",
 #	auth_type => "basic",
 #	username => "test",

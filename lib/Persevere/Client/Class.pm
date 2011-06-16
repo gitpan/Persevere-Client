@@ -9,7 +9,7 @@ Persevere::Client::Class - The Class interface to Persevere the JSON Database
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.2';
 
 use HTTP::Request::Common qw(GET HEAD POST PUT DELETE);
 use Carp        qw(confess);
@@ -117,10 +117,10 @@ sub create {
 		if (defined $self->{sourceClass}){
 			$newclass{sourceClass} = $self->{sourceClass};
 		}
-		my $req = $self->{client}->req('POST', $classpath, undef, \%newclass);
 		if ($self->{client}->{debug}){
 			print "DEBUG (FUNCTION create): POST $classpath " . $self->{client}->{json}->encode(\%newclass) . "\n";
 		}
+		my $req = $self->{client}->req('POST', $classpath, undef, \%newclass);
 		$req->{path} = $classpath;
 		return $req;
 	}else{
@@ -135,13 +135,13 @@ sub createObjects{
 	my $self = shift;
 	my $data = shift;
 	my $classpath = $self->{client}->{uri} . $self->{name};
-	my $req = $self->{client}->req('POST', $classpath, undef, $data);	
+	if ($self->{client}->{debug}){
+		print "DEBUG (FUNCTION createObjects): POST $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
+	}my $req = $self->{client}->req('POST', $classpath, undef, $data);	
 	if (!($req->{success})){
 		$self->{client}->alert($req->{content});
 	}
-	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION createObjects): POST $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
-	}
+	
 	$req->{path} = $classpath;
 	return $req; 
 }
@@ -150,47 +150,49 @@ sub updateObjects{
 	my $self = shift;
 	my $data = shift;
 	my $classpath = $self->{client}->{uri} . $self->{name};
+	if ($self->{client}->{debug}){
+		print "DEBUG (FUNCTION updateObjects): PUT $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
+	}
 	my $req = $self->{client}->req('PUT', $classpath, undef, $data);	
 	if (!($req->{success})){
 		$self->{client}->alert($req->{content});
 	}
-	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION updateObjects): PUT $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
-	}
+	
 	$req->{path} = $classpath;
 	return $req;
 }
 
-sub idGet{
+sub idGet(){
 	my $self = shift;
 	my $id = shift;
 	my $path = $self->{client}->{uri} . $self->{name} . $id;
 	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION idGet): GET $path" . "\n";
+		print "DEBUG (FUNCTION idGet): GET $path \n";
 	}
 	my $idresponse = $self->{client}->req('GET', $path, undef, undef, 1);
 	$idresponse->{path} = $path;
 	return $idresponse;
 }
 
-sub propSet{
+sub propSet(){
 	my $self = shift;
-	my $prop = shift;
-	my $value = shift;
-	my $path = $self->{client}->{uri} . $self->{name} . $prop;
+	my $id = shift;
+	my $data = shift;
+	my $path = $self->{client}->{uri} . $self->{name} . $id;
 	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION propSet): PUT $path $value" . "\n";
+		print "DEBUG (FUNCTION propSet): PUT $path $data \n";
 	}
-	my $setresponse = $self->{client}->req('PUT', $path, undef, $value, 1);
-	return $setresponse;
+	my $idresponse = $self->{client}->req('PUT', $path ,undef, $data, 0, 1);
+	$idresponse->{path} = $path;
+	return $idresponse;
 }
 
-sub idExists{
+sub idExists(){
 	my $self = shift;
 	my $id = shift;
 	my $path = $self->{client}->{uri} . $self->{name} . $id;
 	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION idExists): GET $path" . "\n";
+		print "DEBUG (FUNCTION idExists): GET $path\n";
 	}
 	my $idresponse = $self->{client}->req('GET', $path, undef, undef, 1);
 	if ($idresponse->{code} == "404"){
@@ -200,7 +202,7 @@ sub idExists{
 	}
 }
 
-sub queryRange{
+sub queryRange(){
 	my $self = shift;
 	my $query = shift;
 	my $sub_range_start = shift;
@@ -211,30 +213,30 @@ sub queryRange{
 	my $header = HTTP::Headers->new;
 	$header->header('Range' => "items=$sub_range_start-$sub_range_end");
 	my $path = "$classpath$query";
-	my $testresponse = $self->{client}->req('GET', $path, $header);
 	if ($self->{client}->{debug}){
 		print "DEBUG (FUNCTION queryRange): GET $path $header\n";
-	}
+	}	
+	my $testresponse = $self->{client}->req('GET', $path, $header);
+
 	if ($testresponse->{code} != 200){
 		$self->{client}->alert($testresponse->{status_line});
 	}
 	return $testresponse;
 }
 
-sub query{
+sub query(){
 	my $self = shift;
 	my $query = shift;
 	if (!(defined $query)){
-		$query = "";
+		$query = '';
 	}
 	my $classpath = $self->{client}->{uri} . $self->{name};
 	my @original_data;
-
 	my $path = "$classpath$query";
-	my $testresponse = $self->{client}->req('GET', $path, undef, undef, 0);
 	if ($self->{client}->{debug}){
 		print "DEBUG (FUNCTION query): GET $path\n";
 	}
+	my $testresponse = $self->{client}->req('GET', $path);
 	if ($testresponse->{code} != 200){
 		$self->{client}->alert($testresponse->{status_line});
 	}
@@ -245,10 +247,10 @@ sub delete{
 	my $self = shift;
 	my $dpath = $self->{client}->{uri} . "Class/" .  $self->fullname;
 	# this should be converted to use the req wrapper
-	my $res = $self->{client}->{ua}->request(DELETE $dpath);
 	if ($self->{client}->{debug}){
 		print "DEBUG (FUNCTION delete): DELETE $dpath\n";
 	}
+	my $res = $self->{client}->{ua}->request(DELETE $dpath);
 	$res->{path} = $dpath;
 	my $auth_status = 1;
 	if ($res->code == 401){
@@ -267,7 +269,32 @@ sub delete{
 	return $ret;	
 }
 
-
+sub deleteById{
+	my $self = shift;
+	my $id = shift;
+	my $dpath = $self->{client}->{uri} . $self->fullname . "/$id";
+	# this should be converted to use the req wrapper
+	if ($self->{client}->{debug}){
+		print "DEBUG (FUNCTION delete): DELETE $dpath\n";
+	}
+	my $res = $self->{client}->{ua}->request(DELETE $dpath);
+	$res->{path} = $dpath;
+	my $auth_status = 1;
+	if ($res->code == 401){
+    $auth_status = 0;
+  }
+	my $ret = {
+    code => $res->code,
+    status_line => $res->status_line,
+    success => 0,
+    content => $res->content,
+    auth => $auth_status
+  };
+	if ($res->is_success){
+    $ret->{success} = 1;
+	}
+	return $ret;	
+}
 =pod
 
 =head1 SYNOPSIS
@@ -318,34 +345,6 @@ This module provides an interface to the classes in persevere
 
 	Deletes the class the object refers to.
 
-=item properties
-
-	Enforces schema, this takes a hash ex: {name => {type => "string"}}, name is required, and needs to be of type string. See persevere documentation for more information
-
-=item sourceClass
-
-	change the default storage engine used by persevere when creating new tables, such as InMemorySource
-
-=item uuid
-	
-	changes the default id type from integer to uuid string based id's
-
-=item nouuid
-
-	sets the default id type back to integer
-
-=item idGet
-
-	does a GET on the object with the specified id
-
-=item idExists
-
-	checks if an object with the provided id exists
-
-=item propSet
-
-	does a PUT to update the valie for a specific item property
-
 =item createObjects
 
 	Creates new objects, takes an array of hashes as input.
@@ -376,9 +375,9 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE 
 
-Copyright 2009-2010 Nathanael Anderson.
+Copyright 2009 Nathanael Anderson.
 
-this program is free software; you can redistribute it and/or modify it
+s program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut

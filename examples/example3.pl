@@ -9,7 +9,8 @@ my $testClassName = "TestClass";
 my $json = JSON::XS->new->ascii->shrink->allow_nonref;
 my $persvr = Persevere::Client->new(
 	host => "localhost", 
-	port => "8080", 
+	port => "7080", 
+	auth_type => "none",
 #	auth_type => "basic", 
 #	username => "test", 
 #	password => "pass", 
@@ -34,8 +35,3 @@ if ($classreq->{success}){
 }
 
 print $json->encode(\@class_list) . "\n";
-
-#my $user = "hello123";
-#my $pass = "pass";
-#print "Create User: $user\n";
-#$persvr->newUser($user, $pass);

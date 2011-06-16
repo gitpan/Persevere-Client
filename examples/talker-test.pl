@@ -10,15 +10,16 @@ use Time::HiRes qw(usleep);
 my $json = JSON::XS->new;
 
 my $persvr = Persevere::Client->new(
-								host => "localhost",
-								port => "8080",
-								auth_type => "none",
+		host => "localhost",
+		port => "8080",
+		auth_type => "none",
 #	auth_type => "basic",
 #	username => "test",
 #	password => "pass",
-								debug => 1,
-								defaultSourceClass => "org.persvr.datasource.InMemorySource"
-);
+		debug => 1,
+		defaultSourceClass => "org.persvr.datasource.InMemorySource",
+#		base_uri => "activetalker"
+		);
 
 # createObjects requires an array of hashes, so push your objects (hashes) onto an array
 
@@ -27,7 +28,6 @@ my $initialclass = $persvr->class($className);
 
 while (1){
 my $datareq = $initialclass->query();
-
 # TODO are there timeout issues with apache/comet config?
 
 if ($datareq->{success}){
@@ -40,7 +40,7 @@ if ($datareq->{success}){
 		}else{
 			$data = 1;
 		}
-		print "ID: " . $item->{id} . "\n";
+#		print "ID: " . $item->{id} . "\n";
 		my $propset = $initialclass->propSet("$item->{id}.talking", $data);
 		if ($propset->{code} != 200){
 			warn "error updating $item->{id}.talking";
