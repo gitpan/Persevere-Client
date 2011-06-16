@@ -9,7 +9,7 @@ use JSON::XS;
 my $json = JSON::XS->new;
 
 my $persvr = Persevere::Client->new(
-	host => "dplmon03",
+	host => "localhost",
 	port => "7080",
 	auth_type => "none",
 #	auth_type => "basic",
@@ -20,7 +20,7 @@ my $persvr = Persevere::Client->new(
 );
 
 
-my $className = "Group_hour3";
+my $className = "test";
 my $initialclass = $persvr->class($className);
 print "Class: " . $initialclass->fullname . "\n";
 

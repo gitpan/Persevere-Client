@@ -2,7 +2,7 @@ package Persevere::Client;
 
 use warnings;
 use strict;
-use JSON::Any;
+use JSON;
 use LWP::UserAgent;
 use HTTP::Request qw(GET HEAD POST PUT DELETE);
 use HTTP::Status;
@@ -38,7 +38,7 @@ sub new{
 		($opt{host}   || 'localhost') . ':'   .
 		($opt{port}   || '8080')      . '/';
 	}
-	$self{json} = ($opt{json} || JSON::Any->new(utf8 => 1, allow_blessed =>1));
+	$self{json} = ($opt{json} || JSON->new->utf8->allow_blessed);
 	$self{ua}   = ($opt{ua}   || LWP::UserAgent->new(agent => ($self{agent} || "Persevere::Client/$VERSION")));
 	if (defined $opt{query_timeout}){
 		$self{query_timeout} = $opt{query_timeout};
@@ -292,7 +292,7 @@ Constructor
 
 uri - Takes a hash or hashref of options: uri which specifies the server's URI; scheme, host, port which are used if uri isn't provided and default to 'http', 'localhost', and '8080' respectively; 
 
-json - which defaults to a JSON::Any object with utf8 and allow_blessed turned on but can be replaced with anything with the same interface; 
+json - which defaults to a JSON object with utf8 and allow_blessed turned on but can be replaced with anything with the same interface; 
 
 ua - which is a LWP::UserAgent object and can also be replaced.
 

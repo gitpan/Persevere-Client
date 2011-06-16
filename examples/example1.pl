@@ -2,11 +2,11 @@
 use warnings;
 use strict;
 use Persevere::Client;
-use JSON::XS;
+use JSON;
 
 # Create, Update, Delete Example
 
-my $json = JSON::XS->new;
+my $json = JSON->new;
 
 my $persvr = Persevere::Client->new(
 	host => "localhost",
@@ -20,7 +20,7 @@ my $persvr = Persevere::Client->new(
 );
 
 
-sub createTestObjects($){
+sub createTestObjects {
     my $total = shift;
     my @data;
     my $type;
@@ -41,7 +41,7 @@ my %hash1 = ("name" => "test01", "type" => "odd", "value" => "19");
 my %hash2 = ("name" => "test02", "type" => "even", "value" => "20");
 
 
-sub show_classes(){
+sub show_classes {
 	my @class_list;
 	my $classreq = $persvr->listClassNames;
 	if ($classreq->{success}){

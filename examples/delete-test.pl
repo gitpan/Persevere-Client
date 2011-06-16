@@ -19,7 +19,7 @@ my $persvr = Persevere::Client->new(
 );
 
 
-sub createTestObjects($){
+sub createTestObjects {
     my $total = shift;
     my @data;
     my $type;
@@ -37,7 +37,7 @@ sub createTestObjects($){
 }
 
 
-sub show_classes(){
+sub show_classes {
 	my @class_list;
 	my $classreq = $persvr->listClassNames;
 		if ($classreq->{success}){

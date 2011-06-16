@@ -25,7 +25,7 @@ print "VM: $status->{vm}\nVersion: $status->{version}\n";
 
 my $createdForTest;
 
-sub createTestObjects($){
+sub createTestObjects {
 	my $total = shift;
 	my @data;
 	my $type;

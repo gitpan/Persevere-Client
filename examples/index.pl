@@ -7,14 +7,15 @@ use JSON::XS;
 my $json = JSON::XS->new;
 
 my $persvr = Persevere::Client->new(
-           host => "localhost",
-           port => "7080",
-           auth_type => "basic",
-           username => "test",
-           password => "pass" 
+	host => "localhost",
+	port => "8080",
+	auth_type => "none",
+#	auth_type => "basic",
+#	username => "test",
+#	password => "pass" 
 );
 
-sub createTestObjects($){
+sub createTestObjects {
     my $total = shift;
     my @data;
     my $type;
@@ -35,7 +36,7 @@ my %hash1 = ("name" => "test01", "type" => "odd", "value" => 19);
 my %hash2 = ("name" => "test02", "type" => "even", "value" => 20);
 
 
-sub show_classes(){
+sub show_classes {
 	my @class_list;
 	my $classreq = $persvr->listClassNames;
 		if ($classreq->{success}){
@@ -79,7 +80,7 @@ if (!($postreq->{success})){
 
 if ($initialclass->exists){
 	my @results;
-	my $datareq = $initialclass->queryAll("[?type='even']");
+	my $datareq = $initialclass->query("[?type='even']");
 	if ($datareq->{success}){
 		my @data = @{$datareq->{data}};
 		my @new_data;

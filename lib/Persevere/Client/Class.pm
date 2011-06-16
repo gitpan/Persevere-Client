@@ -69,7 +69,7 @@ sub nouuid{
 	return $self;
 }
 
-=pod
+=begin hide
 sub grant{
 	my $self = shift;
 	my $user = shift;
@@ -88,6 +88,7 @@ sub grant{
 	
 	return $self;
 }
+=end hide
 =cut
 sub create {
 	my $self = shift;
@@ -136,7 +137,7 @@ sub createObjects{
 	my $data = shift;
 	my $classpath = $self->{client}->{uri} . $self->{name};
 	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION createObjects): POST $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
+		print "DEBUG (FUNCTION createObjects): POST $classpath " . $self->{client}->{json}->encode(\@{$data}) . "\n";
 	}my $req = $self->{client}->req('POST', $classpath, undef, $data);	
 	if (!($req->{success})){
 		$self->{client}->alert($req->{content});
@@ -151,7 +152,7 @@ sub updateObjects{
 	my $data = shift;
 	my $classpath = $self->{client}->{uri} . $self->{name};
 	if ($self->{client}->{debug}){
-		print "DEBUG (FUNCTION updateObjects): PUT $classpath " . $self->{client}->{json}->encode(@{$data}) . "\n";
+		print "DEBUG (FUNCTION updateObjects): PUT $classpath " . $self->{client}->{json}->encode(\@{$data}) . "\n";
 	}
 	my $req = $self->{client}->req('PUT', $classpath, undef, $data);	
 	if (!($req->{success})){
@@ -254,17 +255,17 @@ sub delete{
 	$res->{path} = $dpath;
 	my $auth_status = 1;
 	if ($res->code == 401){
-    $auth_status = 0;
-  }
+		$auth_status = 0;
+	}
 	my $ret = {
-    code => $res->code,
-    status_line => $res->status_line,
-    success => 0,
-    content => $res->content,
-    auth => $auth_status
-  };
+		code => $res->code,
+		status_line => $res->status_line,
+		success => 0,
+		content => $res->content,
+		auth => $auth_status
+	};
 	if ($res->is_success){
-    $ret->{success} = 1;
+		$ret->{success} = 1;
 	}
 	return $ret;	
 }
@@ -281,17 +282,17 @@ sub deleteById{
 	$res->{path} = $dpath;
 	my $auth_status = 1;
 	if ($res->code == 401){
-    $auth_status = 0;
-  }
+		$auth_status = 0;
+	}
 	my $ret = {
-    code => $res->code,
-    status_line => $res->status_line,
-    success => 0,
-    content => $res->content,
-    auth => $auth_status
-  };
+		code => $res->code,
+		status_line => $res->status_line,
+		success => 0,
+		content => $res->content,
+		auth => $auth_status
+	};
 	if ($res->is_success){
-    $ret->{success} = 1;
+		$ret->{success} = 1;
 	}
 	return $ret;	
 }

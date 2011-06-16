@@ -12,7 +12,7 @@ my $json = JSON::XS->new->ascii->shrink->allow_nonref;
 
 my $persvr = Persevere::Client->new(
 	host => "localhost",
-	port => "7080",
+	port => "8080",
 	auth_type => "none",
 #	auth_type => "basic",
 #	username => "test",
