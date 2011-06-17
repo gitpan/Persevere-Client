@@ -7,6 +7,8 @@ version 0.2 addes the propSet method, and deleteById method, to allow for updati
 
 version 0.3 provides package naming and version cleanup
 
+version 0.31 fixes perldoc for Persevere::Client::Class
+
 The examples directory has complete functional examples that show full usage of this module
 
 INSTALLATION

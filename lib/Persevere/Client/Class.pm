@@ -9,7 +9,7 @@ Persevere::Client::Class - The Class interface to Persevere the JSON Database
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.31';
 
 use HTTP::Request::Common qw(GET HEAD POST PUT DELETE);
 use Carp        qw(confess);
@@ -69,27 +69,6 @@ sub nouuid{
 	return $self;
 }
 
-=begin hide
-sub grant{
-	my $self = shift;
-	my $user = shift;
-	my $rights = shift;
-	my $path = $self->{client}->{uri} . "User";
-	my $userresponse = $self->{client}->req('GET', $path);
-	if ($userresponse->{success}){
-		foreach (@{$userresponse->{data}){
-			if ($_->{name} eq $user){
-				
-			}
-		}	
-	}else{
-		warn "Error getting user list from $path";
-	}
-	
-	return $self;
-}
-=end hide
-=cut
 sub create {
 	my $self = shift;
 	my $classpath = $self->{client}->{uri} . "Class/";

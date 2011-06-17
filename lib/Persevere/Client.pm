@@ -19,11 +19,11 @@ Persevere::Client - A Simple to use Interface to Persevere the JSON Database
 
 =head1 VERSION
 
-Version 0.3
+Version 0.31
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.31';
 
 sub new{
 	my $class = shift;
@@ -398,6 +398,7 @@ L<http://search.cpan.org/dist/Persevere-Client/>
 
 =head1 ACKNOWLEDGEMENTS
 
+Thanks to mst in #perl-help on irc.perl.org for looking over the code, and providing feedback
 
 =head1 COPYRIGHT & LICENSE
 
